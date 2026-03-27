@@ -34,7 +34,27 @@
 		}
 		?>
 	</div>
+	<section class="search-filter">
+    <form id="ajax-search-form" action="<?php echo admin_url('admin-ajax.php'); ?>" method="POST">
+        <input type="text" name="keyword" placeholder="Поиск">
 
+        <input type="text" name="author_meta" placeholder="Имя автора">
+
+        <select name="year">
+            <option value="">Годы</option>
+            <?php 
+            $years = range(date('Y'), 2020);
+            foreach($years as $year) echo "<option value='$year'>$year</option>";
+            ?>
+        </select>
+
+        <button type="submit">Найти</button>
+        <input type="hidden" name="action" value="article_search">
+    </form>
+
+    <div id="search-results">
+        </div>
+	</section>
 	
 	<?php get_footer(); ?>
 	<?php wp_footer(); ?>
