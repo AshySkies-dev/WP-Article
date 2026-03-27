@@ -55,4 +55,79 @@ function create_taxonomy(){
 		'show_in_rest'          => true, 
 	] );
 }
+
+function create_meta_box() {
+    add_meta_box(
+        'extra_details_box',      
+        'Дополнительные параметры', 
+        'render_meta_box',     
+        'post',                 
+        'normal',                 
+        'high'                   
+    );
+}
+add_action('add_meta_boxes', 'create_meta_box');
+
+function render_meta_box($post) {
+    wp_nonce_field('meta_box_nonce_action', 'meta_box_nonce_field');
+	
+    $text_val     = get_post_meta($post->ID, '_my_text_field', true);
+    $textarea_val = get_post_meta($post->ID, '_my_textarea_field', true);
+    $select_val   = get_post_meta($post->ID, '_my_select_field', true);
+    $checkbox_val = get_post_meta($post->ID, '_my_checkbox_field', true);
+
+    ?>
+    <p>
+        <label for="my_text_field"><strong>Подзаголовок:</strong></label><br />
+        <input type="text" id="my_text_field" name="my_text_field" value="<?php echo esc_attr($text_val); ?>" style="width:100%;" />
+    </p>
+
+    <p>
+        <label for="my_textarea_field"><strong>Заметки автора:</strong></label><br />
+        <textarea id="my_textarea_field" name="my_textarea_field" rows="4" style="width:100%;"><?php echo esc_textarea($textarea_val); ?></textarea>
+    </p>
+
+    <p>
+        <label for="my_select_field"><strong>Сложность материала:</strong></label><br />
+        <select id="my_select_field" name="my_select_field">
+            <option value="easy" <?php selected($select_val, 'easy'); ?>>Легкий</option>
+            <option value="medium" <?php selected($select_val, 'medium'); ?>>Средний</option>
+            <option value="hard" <?php selected($select_val, 'hard'); ?>>Сложный</option>
+        </select>
+    </p>
+
+    <p>
+        <label>
+            <input type="checkbox" name="my_checkbox_field" value="yes" <?php checked($checkbox_val, 'yes'); ?> />
+            <strong>Скрыть дату публикации?</strong>
+        </label>
+    </p>
+    <?php
+}
+
+function save_meta_box_data($post_id) {
+    if (!isset($_POST['meta_box_nonce_field']) || !wp_verify_nonce($_POST['meta_box_nonce_field'], 'meta_box_nonce_action')) {
+        return;
+    }
+
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+
+    if (isset($_POST['my_text_field'])) {
+        update_post_meta($post_id, '_my_text_field', sanitize_text_field($_POST['my_text_field']));
+    }
+
+    if (isset($_POST['my_textarea_field'])) {
+        update_post_meta($post_id, '_my_textarea_field', sanitize_textarea_field($_POST['my_textarea_field']));
+    }
+
+    if (isset($_POST['my_select_field'])) {
+        update_post_meta($post_id, '_my_select_field', $_POST['my_select_field']);
+    }
+
+    $checkbox_value = isset($_POST['my_checkbox_field']) ? 'yes' : 'no';
+    update_post_meta($post_id, '_my_checkbox_field', $checkbox_value);
+}
+add_action('save_post', 'save_meta_box_data');
 ?>
