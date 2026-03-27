@@ -179,3 +179,19 @@ function ajax_article_search_handler() {
     wp_die(); 
 }
 
+function ajax_search_scripts() {
+    wp_enqueue_script(
+        'ajax-search-script', 
+        get_template_directory_uri() . '/js/search.js', 
+        array('jquery'), 
+        '1.0', 
+        true 
+    );
+	
+    wp_localize_script('ajax-search-script', 'search_params', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce'    => wp_create_nonce('search_nonce') 
+    ));
+}
+add_action('wp_enqueue_scripts', 'ajax_search_scripts');
+
