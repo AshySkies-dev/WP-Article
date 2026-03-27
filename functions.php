@@ -195,3 +195,31 @@ function ajax_search_scripts() {
 }
 add_action('wp_enqueue_scripts', 'ajax_search_scripts');
 
+add_action('wp_ajax_nopriv_fetch_posts', 'fetch_posts_callback');
+add_action('wp_ajax_fetch_posts', 'fetch_posts_callback');
+
+function fetch_posts_callback() {
+    check_ajax_referer('search_nonce', 'nonce');
+
+    $search_term = sanitize_text_field($_POST['query']);
+
+    $args = array(
+        'post_type'      => 'post',
+        'posts_per_page' => 5,
+        's'              => $search_term,
+    );
+
+    $query = new WP_Query($args);
+
+    if ($query->have_posts()) :
+        while ($query->have_posts()) : $query->the_post(); ?>
+            <li><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></li>
+        <?php endwhile;
+    else:
+        echo '<li>Ничего не найдено</li>';
+    endif;
+
+    wp_reset_postdata();
+    wp_die(); 
+}
+
