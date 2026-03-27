@@ -9,7 +9,7 @@
 </head>
 <body <?php body_class(); ?>>
 <header>
-    <h1>Karmanov Artyom</h1>
+    <h1>Karm Art</h1>
     <nav>
         <ul>
             <li><a href="<?php echo home_url('/'); ?>">Main</a></li>
@@ -23,7 +23,7 @@
     <div class="about-me">
         <h2>About me:</h2>
         <p> 
-       My name is Karmanov Artyom,
+       My name is Karm Art,
        I'm in my third year of the "Business Informatics" programme 
        in the South Ural State University.
        I am passionate about programming and drawing in the style of Pixel-art.
