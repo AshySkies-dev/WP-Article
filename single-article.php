@@ -1,20 +1,25 @@
-<?php
-get_header(); 
-?>
+<?php get_header(); ?>
 
-<div id="primary" class="content-area container">
-    <main id="main" class="site-main">
-        <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-            <article id="post-<?= esc_attr(get_the_ID()); ?>" <?php post_class(); ?>>
-                <h2><?= get_the_title(); ?></h2>
-                <ul>
-                    <li><b>?????: <?= get_post_meta(get_the_ID(), 'authors', true); ?></b></li>
-                </ul>
-                <br>
-                <div><?= apply_filters('the_content', get_the_content()); ?></div>
-            </article>
-        <?php endwhile; endif; ?>
-    </main>
-</div>
+<main id="main-content">
+    <?php while (have_posts()) : the_post(); ?>
+        <article id="post-<?php the_ID(); ?>">
+            <h1><?php the_title(); ?></h1>
+            
+            <?php if (has_post_thumbnail()) : ?>
+                <div class="post-thumbnail">
+                    <?php the_post_thumbnail('large'); ?>
+                </div>
+            <?php endif; ?>
+
+            <div class="entry-content">
+                <?php the_content(); ?>
+            </div>
+
+            <div class="post-meta">
+                Категории: <?php echo get_the_term_list($post->ID, 'article_category', '', ', '); ?>
+            </div>
+        </article>
+    <?php endwhile; ?>
+</main>
 
 <?php get_footer(); ?>
