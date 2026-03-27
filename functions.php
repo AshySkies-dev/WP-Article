@@ -130,4 +130,52 @@ function save_meta_box_data($post_id) {
     update_post_meta($post_id, '_my_checkbox_field', $checkbox_value);
 }
 add_action('save_post', 'save_meta_box_data');
-?>
+
+add_action('wp_ajax_article_search', 'ajax_article_search_handler');
+add_action('wp_ajax_nopriv_article_search', 'ajax_article_search_handler');
+
+function ajax_article_search_handler() {
+    $keyword = sanitize_text_field($_POST['keyword']);
+    $author = sanitize_text_field($_POST['author_meta']);
+    $year = sanitize_text_field($_POST['year']);
+
+    $args = array(
+        'post_type'      => 'post', 
+        'posts_per_page' => -1,
+        's'              => $keyword, 
+    );
+
+    if (!empty($author)) {
+        $args['meta_query'][] = array(
+            'key'     => 'article_author', 
+            'value'   => $author,
+            'compare' => 'LIKE'
+        );
+    }
+
+    if (!empty($year)) {
+        $args['date_query'] = array(
+            array('year' => $year)
+        );
+    }
+
+    $posts = get_posts($args);
+
+    if ($posts) {
+        foreach ($posts as $post) {
+            setup_postdata($post);
+            ?>
+            <article>
+                <h3><a href="<?php echo get_permalink($post->ID); ?>"><?php echo get_the_title($post->ID); ?></a></h3>
+                <p><?php echo get_the_excerpt($post->ID); ?></p>
+            </article>
+            <?php
+        }
+        wp_reset_postdata();
+    } else {
+        echo '<p>Ничего не найдено.</p>';
+    }
+
+    wp_die(); 
+}
+
