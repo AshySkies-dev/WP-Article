@@ -1,20 +1,25 @@
 jQuery(document).ready(function($) {
-    $('#ajax-search-form').on('submit', function(e) {
-        e.preventDefault();
+    $('#search-input').on('keyup', function() {
+        let searchTerm = $(this).val();
 
-        const formData = $(this).serialize();
-        const resultsContainer = $('#search-results');
-
-        $.ajax({
-            url: '<?php echo admin_url("admin-ajax.php"); ?>',
-            type: 'POST',
-            data: formData,
-            beforeSend: function() {
-                resultsContainer.html('...');
-            },
-            success: function(data) {
-                resultsContainer.html(data);
-            }
-        });
+        if (searchTerm.length >= 3) {
+            $.ajax({
+                url: search_params.ajax_url, 
+                type: 'POST',
+                data: {
+                    action: 'fetch_posts',
+                    query: searchTerm,
+                    nonce: search_params.nonce 
+                },
+                beforeSend: function() {
+                    $('#search-results').html('<li>...</li>');
+                },
+                success: function(data) {
+                    $('#search-results').html(data);
+                }
+            });
+        } else {
+            $('#search-results').empty();
+        }
     });
 });
